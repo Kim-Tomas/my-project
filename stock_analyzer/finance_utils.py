@@ -10,9 +10,29 @@ def load_price_data(ticker: str) -> pd.DataFrame:
 
 def _get_last_filing_url(ticker: str, form_type="10-Q"):
     queryApi = QueryApi(api_key=os.getenv("SEC_API_KEY"))
-    query = {"query": {"query_string": {"query": f"ticker:{ticker} AND formType:{form_type}"}}, "size":1}
+
+    # 最新ファイリングを 1 件だけ取得（降順ソートを明示）
+    query = {
+        "query": {
+            "query_string": {"query": f"ticker:{ticker} AND formType:{form_type}"}
+        },
+        "size": 1,
+        "sort": [{"filedAt": {"order": "desc"}}]
+    }
+
     res = queryApi.get_filings(query)
-    return res[0]["linkToFilingDetails"] if res else None
+
+    if not res:
+        return None
+
+    doc = res[0]
+    # 2025-03 以降の新キー
+    url = doc.get("filingUrl") \
+        or doc.get("linkToFilingDetails") \
+        or doc.get("linkToTxt") \
+        or doc.get("linkToHtml")
+
+    return url
 
 def load_fundamentals(ticker: str):
     extractor = ExtractorApi(os.getenv("SEC_API_KEY"))
