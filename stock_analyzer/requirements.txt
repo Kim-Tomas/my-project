@@ -1,0 +1,10 @@
+streamlit>=1.34
+yfinance>=0.2.40
+sec-api>=1.1.16
+pandas>=2.2
+numpy>=1.26
+ta>=0.11.0
+scikit-learn>=1.4
+xgboost>=2.0
+tqdm>=4.66
+python-dotenv>=1.0
